@@ -15,5 +15,11 @@ func main() {
 			"bio":  "Backend Developer and Software Engineer",
 		})
 	})
-	router.Run()
+	router.GET("/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"title":     "Web Service API GOLANG - David P Simatupang",
+			"deskripsi": "Terimakasih",
+		})
+	})
+	router.Run(":8888")
 }
