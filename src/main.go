@@ -5,16 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func main() {
 	router := gin.Default()
 
-	router.GET("/", rootHandler)
-	router.GET("/hello", helloHandler)
-	router.GET("/produk/:id/:judul", detailProduk)
-	router.GET("/query/", detailQuery)
-	router.POST("/postbook", postBookhandler)
+	v1 := router.Group("/v1")
+
+	v1.GET("/", rootHandler)
+	v1.GET("/hello", helloHandler)
+	v1.GET("/produk/:id/:judul", detailProduk)
+	v1.GET("/query/", detailQuery)
+	v1.POST("/postbook", postBookhandler)
 
 	router.Run()
 
@@ -59,11 +62,23 @@ type BookInput struct {
 func postBookhandler(c *gin.Context) {
 	var bookInput BookInput
 	err := c.ShouldBindJSON(&bookInput)
+
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		fmt.Println(err)
+
+		errorMessages := []string{}
+		for _, e := range err.(validator.ValidationErrors) {
+
+			errorMessage := fmt.Sprintf("Error on field: %s, condition: %s", e.Field(), e.ActualTag())
+			errorMessages = append(errorMessages, errorMessage)
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": errorMessages,
+		})
 		return
+
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"title":     bookInput.Title,
 		"price":     bookInput.Price,
