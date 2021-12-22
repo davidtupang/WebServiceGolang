@@ -17,6 +17,32 @@ func main() {
 		log.Fatal("DB Connection Error")
 	}
 	db.AutoMigrate(&book.Book{})
+
+	//REPOSITORY
+
+	//bookRepository := book.NewRepository(db)
+	//FINDALL Repo
+	// books, err := bookRepository.FindAll()
+	// for _, book := range books {
+	// 	fmt.Println("Title : ", book.Title)
+	// }
+
+	//FINDBYID Repo
+	// id, err := bookRepository.FindById(2)
+	// fmt.Println("Title : ", id.Title)
+
+	//CREATE Repo
+	// book := book.Book{
+	// 	Title:       "Heroik",
+	// 	Description: "Good Book",
+	// 	Price:       95000,
+	// 	Rating:      4,
+	// 	Discount:    0,
+	// }
+	// bookRepository.Create(book)
+
+	//=================================
+
 	//CRUD
 
 	// ======
