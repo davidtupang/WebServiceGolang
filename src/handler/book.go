@@ -9,20 +9,28 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func RootHandler(c *gin.Context) {
+type bookHandler struct {
+	bookService book.Service
+}
+
+func NewBookHandler(bookService book.Service) *bookHandler {
+	return &bookHandler{bookService}
+}
+
+func (h *bookHandler) RootHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"name": "David Pardamean Simatupang",
 		"bio":  "Backend Developer and Software Engineer",
 	})
 }
-func HelloHandler(c *gin.Context) {
+func (h *bookHandler) HelloHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"title":     "Web Service API GOLANG - David P Simatupang",
 		"deskripsi": "Terimakasih",
 	})
 }
 
-func DetailProduk(c *gin.Context) {
+func (h *bookHandler) DetailProduk(c *gin.Context) {
 	id := c.Param("id")
 	judul := c.Param("judul")
 	c.JSON(http.StatusOK, gin.H{
@@ -31,7 +39,7 @@ func DetailProduk(c *gin.Context) {
 	})
 }
 
-func DetailQuery(c *gin.Context) {
+func (h *bookHandler) DetailQuery(c *gin.Context) {
 	id := c.Query("id")
 	title := c.Query("title")
 	c.JSON(http.StatusOK, gin.H{
@@ -40,10 +48,11 @@ func DetailQuery(c *gin.Context) {
 	})
 }
 
-func PostBookhandler(c *gin.Context) {
-	var bookInput book.BookInput
-	err := c.ShouldBindJSON(&bookInput)
+func (h *bookHandler) PostBookhandler(c *gin.Context) {
+	var bookRequest book.BookRequest
+	err := c.ShouldBindJSON(&bookRequest)
 
+	//Ceking Error dalam Array
 	if err != nil {
 
 		errorMessages := []string{}
@@ -59,10 +68,23 @@ func PostBookhandler(c *gin.Context) {
 		return
 
 	}
-
+	//Jika tidak Terjadi Error Masuk Ke Database
+	book, err := h.bookService.Create(bookRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"title":     bookInput.Title,
-		"price":     bookInput.Price,
-		"sub_title": bookInput.SubTitle,
+		"data": book,
 	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"ID":          bookRequest.ID,
+	// 	"title":       bookRequest.Title,
+	// 	"price":       bookRequest.Price,
+	// 	"description": bookRequest.Description,
+	// 	"rating":      bookRequest.Rating,
+	// 	"discount":    bookRequest.Discount,
+	// })
 }

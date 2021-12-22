@@ -17,10 +17,37 @@ func main() {
 		log.Fatal("DB Connection Error")
 	}
 	db.AutoMigrate(&book.Book{})
+	bookRepository := book.NewRepository(db)
+	bookService := book.NewService(bookRepository)
+	bookHandler := handler.NewBookHandler(bookService)
 
-	//REPOSITORY
+	router := gin.Default()
+
+	v1 := router.Group("/v1")
+	v1.GET("/", bookHandler.RootHandler)
+	v1.GET("/hello", bookHandler.HelloHandler)
+	v1.GET("/produk/:id/:judul", bookHandler.DetailProduk)
+	v1.GET("/query/", bookHandler.DetailQuery)
+	v1.POST("/postbook", bookHandler.PostBookhandler)
+
+	router.Run(":99")
+
+	//Service Testing
+	// bookRepository := book.NewRepository(db)
+	// bookService := book.NewService(bookRepository)
+	// bookRequest := book.BookRequest{
+	// 	Title:       "Halo",
+	// 	Description: "Mantap",
+	// 	Price:       75000,
+	// 	Rating:      5,
+	// 	Discount:    25,
+	// }
+	// bookService.Create(bookRequest)
+
+	//REPOSITORY Testing
 
 	//bookRepository := book.NewRepository(db)
+
 	//FINDALL Repo
 	// books, err := bookRepository.FindAll()
 	// for _, book := range books {
@@ -43,7 +70,7 @@ func main() {
 
 	//=================================
 
-	//CRUD
+	//CRUD Testing
 
 	// ======
 	// CREATE
@@ -109,16 +136,17 @@ func main() {
 	// 	fmt.Println("===================")
 	// }
 
-	router := gin.Default()
+	// Testing Routing
+	// router := gin.Default()
 
-	v1 := router.Group("/v1")
+	// v1 := router.Group("/v1")
 
-	v1.GET("/", handler.RootHandler)
-	v1.GET("/hello", handler.HelloHandler)
-	v1.GET("/produk/:id/:judul", handler.DetailProduk)
-	v1.GET("/query/", handler.DetailQuery)
-	v1.POST("/postbook", handler.PostBookhandler)
+	// v1.GET("/", handler.RootHandler)
+	// v1.GET("/hello", handler.HelloHandler)
+	// v1.GET("/produk/:id/:judul", handler.DetailProduk)
+	// v1.GET("/query/", handler.DetailQuery)
+	// v1.POST("/postbook", handler.PostBookhandler)
 
-	router.Run()
+	// router.Run()
 
 }
