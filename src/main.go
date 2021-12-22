@@ -24,11 +24,17 @@ func main() {
 	router := gin.Default()
 
 	v1 := router.Group("/v1")
-	v1.GET("/", bookHandler.RootHandler)
-	v1.GET("/hello", bookHandler.HelloHandler)
-	v1.GET("/produk/:id/:judul", bookHandler.DetailProduk)
-	v1.GET("/query/", bookHandler.DetailQuery)
+	// v1.GET("/", bookHandler.RootHandler)
+	// v1.GET("/hello", bookHandler.HelloHandler)
+	// v1.GET("/produk/:id/:judul", bookHandler.DetailProduk)
+	// v1.GET("/query/", bookHandler.DetailQuery)
+
+	//CRUD Router
 	v1.POST("/postbook", bookHandler.PostBookhandler)
+	v1.GET("/getbookall", bookHandler.GetBookAllhandler)
+	v1.GET("/getbookbyid/:id", bookHandler.GetBookByIdhandler)
+	v1.PUT("/updatebookbyid/:id", bookHandler.UpdateBookByIdhandler)
+	v1.DELETE("/deletebookbyid/:id", bookHandler.DeleteBookByIdhanler)
 
 	router.Run(":99")
 
