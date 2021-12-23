@@ -83,14 +83,25 @@ func (h *bookHandler) GetBookByIdhandler(c *gin.Context) {
 		"data": bookResponse,
 	})
 }
-func (h *bookHandler) UpdateBookByIdhandler(c *gin.Context) {
 
-}
 func (h *bookHandler) DeleteBookByIdhanler(c *gin.Context) {
+	idstring := c.Param("id")
+	id, _ := strconv.Atoi(idstring)
+	b, err := h.bookService.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"errors": err,
+		})
+		return
+	}
+	bookResponse := convertToBookResponse(b)
+	c.JSON(http.StatusOK, gin.H{
+		"data": bookResponse,
+	})
 
 }
 
-func (h *bookHandler) PostBookhandler(c *gin.Context) {
+func (h *bookHandler) CreateBookhandler(c *gin.Context) {
 	var bookRequest book.BookRequest
 	err := c.ShouldBindJSON(&bookRequest)
 
@@ -110,7 +121,7 @@ func (h *bookHandler) PostBookhandler(c *gin.Context) {
 		return
 
 	}
-	//Jika tidak Terjadi Error Masuk Ke Database
+
 	book, err := h.bookService.Create(bookRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -118,20 +129,65 @@ func (h *bookHandler) PostBookhandler(c *gin.Context) {
 		})
 		return
 	}
+
+	//Jika tidak Terjadi Error Masuk Ke Database
 	postResponse := convertToBookResponse(book)
 	c.JSON(http.StatusOK, gin.H{
 		"data": postResponse,
 	})
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"ID":          bookRequest.ID,
-	// 	"title":       bookRequest.Title,
-	// 	"price":       bookRequest.Price,
-	// 	"description": bookRequest.Description,
-	// 	"rating":      bookRequest.Rating,
-	// 	"discount":    bookRequest.Discount,
-	// })
+
 }
 
+func (h *bookHandler) UpdateBookByIdhandler(c *gin.Context) {
+	var bookRequest book.BookRequest
+	err := c.ShouldBindJSON(&bookRequest)
+
+	//Ceking Error dalam Array
+	if err != nil {
+
+		errorMessages := []string{}
+		for _, e := range err.(validator.ValidationErrors) {
+
+			errorMessage := fmt.Sprintf("Error on field: %s, condition: %s", e.Field(), e.ActualTag())
+			errorMessages = append(errorMessages, errorMessage)
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": errorMessages,
+		})
+		return
+
+	}
+	idstring := c.Param("id")
+	id, _ := strconv.Atoi(idstring)
+
+	book, err := h.bookService.Update(id, bookRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	//Jika tidak Terjadi Error Masuk Ke Database
+	postResponse := convertToBookResponse(book)
+	c.JSON(http.StatusOK, gin.H{
+		"data": postResponse,
+	})
+
+}
+
+//Testing Ouptput Json
+
+// c.JSON(http.StatusOK, gin.H{
+// 	"ID":          bookRequest.ID,
+// 	"title":       bookRequest.Title,
+// 	"price":       bookRequest.Price,
+// 	"description": bookRequest.Description,
+// 	"rating":      bookRequest.Rating,
+// 	"discount":    bookRequest.Discount,
+// })
+
+//untuk conver keluaran field atribut
 func convertToBookResponse(b book.Book) book.BookResponse {
 	return book.BookResponse{
 		ID:          b.ID,

@@ -30,7 +30,7 @@ func main() {
 	// v1.GET("/query/", bookHandler.DetailQuery)
 
 	//CRUD Router
-	v1.POST("/postbook", bookHandler.PostBookhandler)
+	v1.POST("/postbook", bookHandler.CreateBookhandler)
 	v1.GET("/getbookall", bookHandler.GetBookAllhandler)
 	v1.GET("/getbookbyid/:id", bookHandler.GetBookByIdhandler)
 	v1.PUT("/updatebookbyid/:id", bookHandler.UpdateBookByIdhandler)
